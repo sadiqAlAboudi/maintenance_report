@@ -134,7 +134,7 @@
         height: 1123px !important;
         min-height: 1123px !important;
         max-height: 1123px !important;
-        padding: 48px 56px !important;
+        padding: 44px 54px !important;
         box-shadow: none !important;
         border: none !important;
         overflow: hidden !important;
@@ -146,7 +146,7 @@
           content: '' !important;
           display: block !important;
           position: absolute !important;
-          inset: 22px !important;
+          inset: 20px !important;
           border: 2px solid #000000 !important;
           pointer-events: none !important;
         }
@@ -155,23 +155,23 @@
           content: '' !important;
           display: block !important;
           position: absolute !important;
-          inset: 28px !important;
+          inset: 26px !important;
           border: 1px solid #000000 !important;
           pointer-events: none !important;
         }
 
         & header {
-          margin-bottom: 10px !important;
-          padding-bottom: 8px !important;
+          margin-bottom: 8px !important;
+          padding-bottom: 6px !important;
 
           &>img {
-            width: 72px !important;
-            height: 72px !important;
+            width: 68px !important;
+            height: 68px !important;
             margin: 0 auto 4px !important;
           }
 
           &>h1 {
-            font-size: 1.5rem !important;
+            font-size: 1.45rem !important;
           }
         }
 
@@ -182,14 +182,14 @@
           justify-content: space-between !important;
 
           &>p:first-of-type {
-            font-size: 1.1rem !important;
+            font-size: 1.05rem !important;
             margin-bottom: 4px !important;
           }
 
           &>p:nth-of-type(2) {
-            font-size: 0.92rem !important;
-            line-height: 1.6 !important;
-            margin-bottom: 10px !important;
+            font-size: 0.9rem !important;
+            line-height: 1.55 !important;
+            margin-bottom: 8px !important;
           }
         }
 
@@ -198,38 +198,39 @@
           display: flex !important;
           flex-direction: column !important;
           justify-content: space-between !important;
-          gap: 12px !important;
+          gap: 10px !important;
 
           &>fieldset {
             flex: 1 !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-around !important;
-            padding: 8px 14px !important;
-            gap: 6px !important;
+            padding: 8px 12px !important;
+            gap: 5px !important;
 
             &>div>input,
-            &>div>textarea {
+            &>div>textarea,
+            &>div>select {
               padding: 2px 0 !important;
-              font-size: 0.92rem !important;
+              font-size: 0.9rem !important;
             }
 
             &>div>textarea {
-              min-height: 36px !important;
+              min-height: 32px !important;
             }
           }
 
           &>section {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 14px !important;
+            gap: 12px !important;
 
             &>fieldset {
               padding: 8px 12px !important;
-              gap: 6px !important;
+              gap: 5px !important;
 
               &>figure>canvas {
-                height: 95px !important;
+                height: 90px !important;
                 border: 1px solid #000000 !important;
               }
             }
@@ -237,12 +238,16 @@
         }
 
         & input,
-        & textarea {
+        & textarea,
+        & select {
           border: none !important;
           border-bottom: 1px dotted #000000 !important;
           background: transparent !important;
           box-shadow: none !important;
           resize: none !important;
+          appearance: none !important;
+          -webkit-appearance: none !important;
+          -moz-appearance: none !important;
         }
       }
     }
@@ -326,7 +331,8 @@
           }
 
           &>input,
-          &>textarea {
+          &>textarea,
+          &>select {
             width: 100%;
             border: 1px solid #777;
             border-bottom: 2px solid #000000;
@@ -335,10 +341,15 @@
             font-family: inherit;
             font-size: 0.95rem;
             outline: none;
+            background: #ffffff;
 
             &:focus {
               border-color: #000000;
             }
+          }
+
+          &>select {
+            cursor: pointer;
           }
 
           &>textarea {
@@ -601,6 +612,15 @@
           </div>
 
           <div>
+            <label for="f_res">نتيجة الصيانة:</label>
+            <select id="f_res">
+              <option value="تم حل المشكلة بالكامل">تم حل المشكلة بالكامل</option>
+              <option value="تم حل المشكلة جزئياً">تم حل المشكلة جزئياً</option>
+              <option value="تعذر إصلاح المشكلة">تعذر إصلاح المشكلة</option>
+            </select>
+          </div>
+
+          <div>
             <label for="f4">ملاحظات:</label>
             <textarea id="f4" rows="2" placeholder="الإجراءات المتخذة وحالة الجهاز الفنية بعد الإنجاز وأية توصيات تشغيلية..."></textarea>
           </div>
@@ -808,6 +828,16 @@
             originalTypes.push(null);
             inp.textContent = inp.value;
           }
+        });
+
+        el.querySelectorAll('select').forEach(sel => {
+          Array.from(sel.options).forEach(opt => {
+            if (opt.value === sel.value) {
+              opt.setAttribute('selected', 'selected');
+            } else {
+              opt.removeAttribute('selected');
+            }
+          });
         });
 
         const hiddenEls = el.querySelectorAll('figcaption button, figure small');
