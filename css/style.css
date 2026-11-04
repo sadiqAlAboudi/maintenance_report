@@ -1,3 +1,8 @@
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
 @font-face {
   font-family: 'IBM Plex Sans Arabic';
   src: url('./IBM-Plex-Sans-Arabic.woff2') format('woff2');
@@ -389,7 +394,8 @@ dialog#sigModal > footer > button#sigUndo {
 }
 
 dialog#loginModal,
-dialog#nameModal {
+dialog#nameModal,
+dialog#alertModal {
   border: none;
   border-radius: 8px;
   padding: 0;
@@ -402,7 +408,8 @@ dialog#nameModal {
 }
 
 dialog#loginModal::backdrop,
-dialog#nameModal::backdrop {
+dialog#nameModal::backdrop,
+dialog#alertModal::backdrop {
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
 }
@@ -434,6 +441,12 @@ dialog#nameModal::backdrop {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+#alertMessage {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #222222;
 }
 
 .field {
@@ -490,6 +503,16 @@ dialog#loginModal .field input {
   user-select: none;
 }
 
+.paper-hint {
+  font-size: 0.8rem;
+  color: #333333;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 6px 10px;
+  line-height: 1.4;
+}
+
 .input-suffix:focus-within,
 .field input:focus {
   border-color: #000;
@@ -508,7 +531,7 @@ dialog#loginModal .field input {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .modal-actions button {
@@ -527,6 +550,7 @@ dialog#loginModal .field input {
 }
 
 .modal-actions button[type="submit"],
+.modal-actions button#alertConfirmBtn,
 dialog#loginModal button[type="submit"] {
   background: #000000;
   color: #ffffff;
@@ -540,6 +564,7 @@ dialog#loginModal button[type="submit"] {
 }
 
 .modal-actions button[type="submit"]:hover,
+.modal-actions button#alertConfirmBtn:hover,
 dialog#loginModal button[type="submit"]:hover {
   background: #222;
 }
@@ -573,16 +598,15 @@ dialog#loginModal button[type="submit"]:hover {
 }
 
 @media print {
-  @page {
-    size: A4 portrait;
-    margin: 0;
-  }
-
+  html,
   body {
-    background: #ffffff !important;
-    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
     margin: 0 !important;
-    min-height: auto !important;
+    padding: 0 !important;
+    display: block !important;
+    background: #ffffff !important;
+    overflow: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -598,11 +622,11 @@ dialog#loginModal button[type="submit"]:hover {
     box-shadow: none !important;
     border: none !important;
     width: 210mm !important;
-    height: 297mm !important;
     max-width: 210mm !important;
-    min-height: 297mm !important;
+    min-height: 275mm !important;
+    height: 297mm !important;
     max-height: 297mm !important;
-    padding: 14mm 16mm !important;
+    padding: 12mm 14mm !important;
     margin: 0 auto !important;
     page-break-inside: avoid !important;
     page-break-after: avoid !important;
@@ -613,13 +637,13 @@ dialog#loginModal button[type="submit"]:hover {
 
   main::before {
     display: block !important;
-    inset: 6mm !important;
+    inset: 5mm !important;
     border: 2px solid #000000 !important;
   }
 
   main::after {
     display: block !important;
-    inset: 7.5mm !important;
+    inset: 6.5mm !important;
     border: 1px solid #000000 !important;
   }
 

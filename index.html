@@ -52,11 +52,25 @@
           <span>.pdf</span>
         </div>
       </div>
+      <p class="paper-hint">تلميح: اختر حجم الورق A4 في خيارات الطباعة للحصول على القياس الأمثل.</p>
       <div class="modal-actions">
         <button type="button" id="cancelNameBtn">إلغاء</button>
         <button type="submit" id="confirmNameBtn">تأكيد وتحميل</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="alertModal">
+    <div class="modal-header">
+      <h3 id="alertTitle">تنبيه</h3>
+    </div>
+    <div class="modal-body">
+      <p id="alertMessage"></p>
+      <div class="modal-actions">
+        <button type="button" id="alertCancelBtn">إلغاء</button>
+        <button type="button" id="alertConfirmBtn">حسناً</button>
+      </div>
+    </div>
   </dialog>
 
   <main id="report">

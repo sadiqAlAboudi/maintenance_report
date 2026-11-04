@@ -82,6 +82,29 @@ const AUTH_CONFIG = {
   passHash: "1706ba9b6265e3bf6c5b908d374a509e4c59960d4d3ff9c25e6f6e0124adc01e"
 };
 
+function showModalAlert(message, title = 'تنبيه', isConfirm = false) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('alertModal');
+    document.getElementById('alertTitle').textContent = title;
+    document.getElementById('alertMessage').textContent = message;
+    const cancelBtn = document.getElementById('alertCancelBtn');
+    const confirmBtn = document.getElementById('alertConfirmBtn');
+    cancelBtn.style.display = isConfirm ? 'inline-block' : 'none';
+    confirmBtn.textContent = isConfirm ? 'تأكيد' : 'حسناً';
+
+    const finish = val => {
+      confirmBtn.onclick = null;
+      cancelBtn.onclick = null;
+      modal.close();
+      resolve(val);
+    };
+
+    confirmBtn.onclick = () => finish(true);
+    cancelBtn.onclick = () => finish(false);
+    modal.showModal();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginModal = document.getElementById('loginModal');
   const loginForm = document.getElementById('loginForm');
@@ -165,8 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (!confirm('هل ترغب بتفريغ حقول الاستمارة لبدء تقرير جديد؟')) return;
+    resetBtn.addEventListener('click', async () => {
+      const ok = await showModalAlert('هل ترغب بتفريغ حقول الاستمارة لبدء تقرير جديد؟', 'تأكيد التفريغ', true);
+      if (!ok) return;
       document.querySelectorAll('#report input:not(#f5):not([type="date"]), #report textarea').forEach(el => el.value = '');
       document.querySelectorAll('#report canvas').forEach(c => {
         c.getContext('2d').clearRect(0, 0, c.width, c.height);
@@ -329,10 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
     sigModal.close();
   });
 
-  saveBtn.addEventListener('click', () => {
+  saveBtn.addEventListener('click', async () => {
     if (!f1.value.trim()) {
+      await showModalAlert('يرجى إدخال الجهة الطالبة للصيانة أولاً.', 'حقل مطلوب');
       f1.focus();
-      alert('يرجى إدخال الجهة الطالبة للصيانة أولاً.');
       return;
     }
     const cleanDept = f1.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\s+/g, '_');
