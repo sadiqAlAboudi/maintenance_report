@@ -344,85 +344,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cancelNameBtn.addEventListener('click', () => nameModal.close());
 
-  nameForm.addEventListener('submit', async () => {
+  nameForm.addEventListener('submit', () => {
     let chosenName = pdfFilenameInput.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\.pdf$/i, '');
     if (!chosenName) chosenName = 'تقرير_صيانة';
     nameModal.close();
-    await exportToPdf(`${chosenName}.pdf`);
+
+    const originalTitle = document.title;
+    document.title = chosenName;
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
   });
-
-  async function exportToPdf(filename) {
-    saveBtn.disabled = true;
-    const prevText = saveBtn.innerHTML;
-    saveBtn.textContent = 'جاري المعالجة...';
-
-    const el = document.getElementById('report');
-    const inputs = el.querySelectorAll('input, textarea');
-    const originalPlaceholders = [];
-    const originalTypes = [];
-    const oldScrollY = window.scrollY;
-    window.scrollTo(0, 0);
-
-    inputs.forEach(inp => {
-      originalPlaceholders.push(inp.getAttribute('placeholder'));
-      inp.removeAttribute('placeholder');
-      if (inp.tagName === 'INPUT') {
-        originalTypes.push(inp.type);
-        if (inp.type === 'date') inp.type = 'text';
-        inp.setAttribute('value', inp.value);
-      } else {
-        originalTypes.push(null);
-        inp.textContent = inp.value;
-      }
-    });
-
-    el.querySelectorAll('select').forEach(sel => {
-      Array.from(sel.options).forEach(opt => {
-        if (opt.value === sel.value) {
-          opt.setAttribute('selected', 'selected');
-        } else {
-          opt.removeAttribute('selected');
-        }
-      });
-    });
-
-    const hiddenEls = el.querySelectorAll('figcaption button, figure small');
-    hiddenEls.forEach(h => h.style.display = 'none');
-    el.setAttribute('data-pdf', 'true');
-    void el.offsetWidth;
-
-    try {
-      const dataUrl = await htmlToImage.toJpeg(el, {
-        quality: 0.85,
-        pixelRatio: 2,
-        width: 794,
-        height: 1123,
-        backgroundColor: '#ffffff'
-      });
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-
-      pdf.addImage(dataUrl, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-      pdf.save(filename);
-    } catch (err) {
-      console.error(err);
-      alert('حدث خطأ أثناء تصدير ملف PDF، يرجى المحاولة ثانية.');
-    } finally {
-      el.removeAttribute('data-pdf');
-      hiddenEls.forEach(h => h.style.display = '');
-      inputs.forEach((inp, i) => {
-        if (originalPlaceholders[i] !== null) inp.setAttribute('placeholder', originalPlaceholders[i]);
-        if (originalTypes[i] !== null) inp.type = originalTypes[i];
-      });
-      window.scrollTo(0, oldScrollY);
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = prevText;
-    }
-  }
 });

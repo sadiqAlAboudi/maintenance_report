@@ -1,12 +1,10 @@
-const CACHE_NAME = 'maintenance-report-v8';
+const CACHE_NAME = 'maintenance-report-v9';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './images/uni_logo.svg',
   './IBM-Plex-Sans-Arabic.woff2',
-  './js/html-to-image.min.js',
-  './js/jspdf.umd.min.js',
   './js/app.js',
   './css/style.css'
 ];
