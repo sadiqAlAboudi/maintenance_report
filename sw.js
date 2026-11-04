@@ -1,4 +1,4 @@
-const CACHE_NAME = 'maintenance-report-v6';
+const CACHE_NAME = 'maintenance-report-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,7 +6,9 @@ const ASSETS_TO_CACHE = [
   './uni_logo.svg',
   './IBM-Plex-Sans-Arabic.woff2',
   './js/html-to-image.min.js',
-  './js/jspdf.umd.min.js'
+  './js/jspdf.umd.min.js',
+  './js/app.js',
+  './css/style.css'
 ];
 
 self.addEventListener('install', (event) => {
