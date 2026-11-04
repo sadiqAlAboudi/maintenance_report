@@ -1,27 +1,16 @@
-/**
- * نظام التوثيق والمصادقة لتقارير الصيانة - جامعة القادسية
- */
-
-/* ========================================================
-   1. خوارزمية SHA-256 دقيقة ومستقلة تماماً
-   ======================================================== */
 function sha256Sync(ascii) {
   function rightRotate(value, amount) {
     return (value >>> amount) | (value << (32 - amount));
   }
-
   const mathPow = Math.pow;
   const maxWord = mathPow(2, 32);
   let result = '';
   const words = [];
   const asciiBitLength = ascii.length * 8;
-
-  // الثوابت الرياضية القياسية لـ SHA-256
   const hash = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
     0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
   ];
-
   const k = [
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -45,7 +34,6 @@ function sha256Sync(ascii) {
   for (let j = 0; j < words.length; ) {
     const w = words.slice(j, (j += 16));
     const oldHash = hash.slice(0);
-
     for (let i = 0; i < 64; i++) {
       const w15 = w[i - 15], w2 = w[i - 2];
       const s0 = rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3);
@@ -54,7 +42,6 @@ function sha256Sync(ascii) {
       const temp1 = (hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + (w[i] = (i < 16) ? w[i] : ((w[i - 16] + s0 + w[i - 7] + s1) | 0))) | 0;
       const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
       const temp2 = ((rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj) | 0;
-
       hash[7] = hash[6];
       hash[6] = hash[5];
       hash[5] = hash[4];
@@ -64,7 +51,6 @@ function sha256Sync(ascii) {
       hash[1] = hash[0];
       hash[0] = (temp1 + temp2) | 0;
     }
-
     for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
   }
 
@@ -79,10 +65,10 @@ function sha256Sync(ascii) {
 
 async function sha256(message) {
   const text = message.trim();
-  if (window.crypto && crypto.subtle) {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
     try {
       const msgBuffer = new TextEncoder().encode(text);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
       return Array.from(new Uint8Array(hashBuffer))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
@@ -91,54 +77,57 @@ async function sha256(message) {
   return sha256Sync(text);
 }
 
-/* ========================================================
-   بيانات الاعتماد المشفرة
-   ======================================================== */
 const AUTH_CONFIG = {
-  // admin
   userHash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-  // qu@2026 (الناتج الرياضي الدقيق)
   passHash: "1706ba9b6265e3bf6c5b908d374a509e4c59960d4d3ff9c25e6f6e0124adc01e"
 };
 
-/* ========================================================
-   2. إدارة تسجيل الدخول وتأمين الصفحة
-   ======================================================== */
 document.addEventListener('DOMContentLoaded', () => {
   const loginModal = document.getElementById('loginModal');
   const loginForm = document.getElementById('loginForm');
   const loginError = document.getElementById('loginError');
+  const nameModal = document.getElementById('nameModal');
+  const nameForm = document.getElementById('nameForm');
+  const pdfFilenameInput = document.getElementById('pdf_filename');
+  const cancelNameBtn = document.getElementById('cancelNameBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const f1 = document.getElementById('f1');
+  const f5 = document.getElementById('f5');
+  const f6 = document.getElementById('f6');
+  const f8 = document.getElementById('f8');
 
-  // منع الإغلاق بواسطة زر Esc أو أي حدث إلغاء
   loginModal.addEventListener('cancel', e => e.preventDefault());
   window.addEventListener('keydown', e => {
     if (e.key === 'Escape' && loginModal.open) {
       e.preventDefault();
     }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      if (!document.body.classList.contains('locked')) {
+        saveBtn.click();
+      }
+    }
   });
 
-  // إعادة الفتح تلقائياً في حال أُغلق المودال دون إتمام المصادقة
   loginModal.addEventListener('close', () => {
     if (sessionStorage.getItem('qu_auth') !== 'granted') {
       loginModal.showModal();
     }
   });
 
-  // فحص حالة الجلسة الحالية
   if (sessionStorage.getItem('qu_auth') === 'granted') {
     document.body.classList.remove('locked');
   } else {
     loginModal.showModal();
   }
 
-  // معالجة محاولة تسجيل الدخول
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.style.display = 'none';
-
     const u = document.getElementById('u_name').value;
     const p = document.getElementById('u_pass').value;
-
     const [enteredUserHash, enteredPassHash] = await Promise.all([sha256(u), sha256(p)]);
 
     if (enteredUserHash === AUTH_CONFIG.userHash && enteredPassHash === AUTH_CONFIG.passHash) {
@@ -150,33 +139,104 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ضبط التاريخ تلقائياً إلى تاريخ اليوم
-  const today = new Date().toISOString().split('T')[0];
-  document.querySelectorAll('input[type="date"]').forEach(d => d.value = today);
+  const setTodayDates = () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (f6 && !f6.value) f6.value = today;
+    if (f8 && !f8.value) f8.value = today;
+  };
+  setTodayDates();
+
+  const savedTechName = localStorage.getItem('qu_tech_name');
+  if (savedTechName && f5) {
+    f5.value = savedTechName;
+  }
+  if (f5) {
+    f5.addEventListener('input', () => {
+      localStorage.setItem('qu_tech_name', f5.value.trim());
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('qu_auth');
+      document.body.classList.add('locked');
+      loginModal.showModal();
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('هل ترغب بتفريغ حقول الاستمارة لبدء تقرير جديد؟')) return;
+      document.querySelectorAll('#report input:not(#f5):not([type="date"]), #report textarea').forEach(el => el.value = '');
+      document.querySelectorAll('#report canvas').forEach(c => {
+        c.getContext('2d').clearRect(0, 0, c.width, c.height);
+      });
+      document.getElementById('f_res').selectedIndex = 0;
+      setTodayDates();
+    });
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
-  /* ========================================================
-     3. إدارة التوقيع اليدوي على الشاشة
-     ======================================================== */
-  const dialog = document.getElementById('sigModal');
+  const sigModal = document.getElementById('sigModal');
   const pad = document.getElementById('pad');
   const ctx = pad.getContext('2d');
-  let target = null, drawing = false, dpr = 1;
+  const sigCancel = document.getElementById('sigCancel');
+  const sigUndo = document.getElementById('sigUndo');
+  const sigClear = document.getElementById('sigClear');
+  const sigAccept = document.getElementById('sigAccept');
+
+  let target = null;
+  let drawing = false;
+  let dpr = 1;
+  let strokes = [];
+  let currentStroke = null;
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-  function resize() {
+  function recalculateBounds() {
+    minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
+    for (const stroke of strokes) {
+      for (const pt of stroke) {
+        minX = Math.min(minX, pt.x);
+        minY = Math.min(minY, pt.y);
+        maxX = Math.max(maxX, pt.x);
+        maxY = Math.max(maxY, pt.y);
+      }
+    }
+  }
+
+  function redrawPad() {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, pad.width, pad.height);
+    ctx.restore();
+
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#000000';
+
+    for (const stroke of strokes) {
+      if (!stroke.length) continue;
+      ctx.beginPath();
+      ctx.moveTo(stroke[0].x, stroke[0].y);
+      for (let i = 1; i < stroke.length; i++) {
+        ctx.lineTo(stroke[i].x, stroke[i].y);
+      }
+      ctx.stroke();
+    }
+    recalculateBounds();
+  }
+
+  function resizePad() {
     dpr = window.devicePixelRatio || 1;
     const rect = pad.getBoundingClientRect();
     pad.width = rect.width * dpr;
     pad.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
-    ctx.lineWidth = 3.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#000000';
+    redrawPad();
   }
 
   function getPos(e) {
@@ -184,15 +244,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  function resetBounds() {
-    minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
-  }
-
   pad.addEventListener('pointerdown', e => {
     e.preventDefault();
     try { pad.setPointerCapture(e.pointerId); } catch (_) {}
     drawing = true;
     const p = getPos(e);
+    currentStroke = [p];
+    strokes.push(currentStroke);
     minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
     maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
     ctx.beginPath();
@@ -200,32 +258,33 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   pad.addEventListener('pointermove', e => {
-    if (!drawing) return;
+    if (!drawing || !currentStroke) return;
     e.preventDefault();
     const p = getPos(e);
+    currentStroke.push(p);
     minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
     maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
   });
 
-  const stop = e => {
+  const stopDrawing = e => {
     if (!drawing) return;
     drawing = false;
+    currentStroke = null;
     try { pad.releasePointerCapture(e.pointerId); } catch (_) {}
   };
-  pad.addEventListener('pointerup', stop);
-  pad.addEventListener('pointercancel', stop);
+  pad.addEventListener('pointerup', stopDrawing);
+  pad.addEventListener('pointercancel', stopDrawing);
 
   document.querySelectorAll('figure').forEach(fig => {
     const c = fig.querySelector('canvas');
     const b = fig.querySelector('button');
     c.addEventListener('click', () => {
       target = c;
-      dialog.showModal();
-      resize();
-      resetBounds();
-      ctx.clearRect(0, 0, pad.width, pad.height);
+      strokes = [];
+      sigModal.showModal();
+      resizePad();
     });
     b.addEventListener('click', e => {
       e.stopPropagation();
@@ -233,36 +292,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  const btns = dialog.querySelectorAll('footer button');
-  btns[0].addEventListener('click', () => dialog.close());
-  btns[1].addEventListener('click', () => {
-    ctx.clearRect(0, 0, pad.width, pad.height);
-    resetBounds();
+  sigCancel.addEventListener('click', () => sigModal.close());
+
+  sigUndo.addEventListener('click', () => {
+    if (strokes.length) {
+      strokes.pop();
+      redrawPad();
+    }
   });
-  btns[2].addEventListener('click', () => {
-    if (target && minX < maxX) {
+
+  sigClear.addEventListener('click', () => {
+    strokes = [];
+    redrawPad();
+  });
+
+  sigAccept.addEventListener('click', () => {
+    if (target && minX < maxX && minY < maxY) {
       const tCtx = target.getContext('2d');
       tCtx.clearRect(0, 0, target.width, target.height);
       const padGap = 16;
-      const sw = (maxX - minX) + padGap * 2;
-      const sh = (maxY - minY) + padGap * 2;
-      const sx = Math.max(0, minX - padGap) * dpr;
-      const sy = Math.max(0, minY - padGap) * dpr;
-      const sW = sw * dpr;
-      const sH = sh * dpr;
+      const x1 = Math.max(0, minX - padGap);
+      const y1 = Math.max(0, minY - padGap);
+      const x2 = Math.min(pad.width / dpr, maxX + padGap);
+      const y2 = Math.min(pad.height / dpr, maxY + padGap);
+      const sw = Math.max(1, x2 - x1);
+      const sh = Math.max(1, y2 - y1);
+      const sx = x1 * dpr;
+      const sy = y1 * dpr;
+      const sW = Math.min(pad.width - sx, sw * dpr);
+      const sH = Math.min(pad.height - sy, sh * dpr);
       const scale = Math.min((target.width * 0.9) / sw, (target.height * 0.85) / sh);
       const dx = (target.width - sw * scale) / 2;
       const dy = (target.height - sh * scale) / 2;
       tCtx.drawImage(pad, sx, sy, sW, sH, dx, dy, sw * scale, sh * scale);
     }
-    dialog.close();
+    sigModal.close();
   });
 
-  /* ========================================================
-     4. تصدير التقرير بصيغة PDF
-     ======================================================== */
-  const saveBtn = document.getElementById('saveBtn');
-  saveBtn.addEventListener('click', async () => {
+  saveBtn.addEventListener('click', () => {
+    if (!f1.value.trim()) {
+      f1.focus();
+      alert('يرجى إدخال الجهة الطالبة للصيانة أولاً.');
+      return;
+    }
+    const cleanDept = f1.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\s+/g, '_');
+    const dateVal = (f6 && f6.value) || new Date().toISOString().split('T')[0];
+    pdfFilenameInput.value = `تقرير_صيانة_${cleanDept}_${dateVal}`;
+    nameModal.showModal();
+    pdfFilenameInput.select();
+  });
+
+  cancelNameBtn.addEventListener('click', () => nameModal.close());
+
+  nameForm.addEventListener('submit', async () => {
+    let chosenName = pdfFilenameInput.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\.pdf$/i, '');
+    if (!chosenName) chosenName = 'تقرير_صيانة';
+    nameModal.close();
+    await exportToPdf(`${chosenName}.pdf`);
+  });
+
+  async function exportToPdf(filename) {
     saveBtn.disabled = true;
     const prevText = saveBtn.innerHTML;
     saveBtn.textContent = 'جاري المعالجة...';
@@ -271,11 +360,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputs = el.querySelectorAll('input, textarea');
     const originalPlaceholders = [];
     const originalTypes = [];
+    const oldScrollY = window.scrollY;
+    window.scrollTo(0, 0);
 
     inputs.forEach(inp => {
       originalPlaceholders.push(inp.getAttribute('placeholder'));
       inp.removeAttribute('placeholder');
-
       if (inp.tagName === 'INPUT') {
         originalTypes.push(inp.type);
         if (inp.type === 'date') inp.type = 'text';
@@ -303,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const dataUrl = await htmlToImage.toJpeg(el, {
-        quality: 0.82,
+        quality: 0.85,
         pixelRatio: 2,
         width: 794,
         height: 1123,
@@ -319,9 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       pdf.addImage(dataUrl, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-      pdf.save('تقرير_صيانة.pdf');
+      pdf.save(filename);
     } catch (err) {
-      console.error('PDF export failed:', err);
+      console.error(err);
+      alert('حدث خطأ أثناء تصدير ملف PDF، يرجى المحاولة ثانية.');
     } finally {
       el.removeAttribute('data-pdf');
       hiddenEls.forEach(h => h.style.display = '');
@@ -329,8 +420,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (originalPlaceholders[i] !== null) inp.setAttribute('placeholder', originalPlaceholders[i]);
         if (originalTypes[i] !== null) inp.type = originalTypes[i];
       });
+      window.scrollTo(0, oldScrollY);
       saveBtn.disabled = false;
       saveBtn.innerHTML = prevText;
     }
-  });
+  }
 });

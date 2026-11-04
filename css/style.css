@@ -24,7 +24,6 @@ body {
   min-height: 100vh;
 }
 
-/* قفل المحتوى حتى يتم إدخال بيانات الاعتماد بنجاح */
 body.locked main,
 body.locked nav {
   display: none !important;
@@ -60,7 +59,6 @@ main::after {
   pointer-events: none;
 }
 
-/* تنسيقات تصدير PDF */
 main[data-pdf] {
   width: 794px !important;
   min-width: 794px !important;
@@ -200,7 +198,6 @@ header > img {
   object-fit: contain;
   display: block;
   margin: 0 auto 6px;
-  image-rendering: -webkit-optimize-contrast;
 }
 
 header > h1 {
@@ -386,40 +383,59 @@ nav {
   bottom: 16px;
   z-index: 10;
   margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-nav > button {
-  background: #000000;
-  color: #ffffff;
-  border: none;
-  padding: 12px 28px;
+nav button {
   font-family: inherit;
-  font-size: 1rem;
   font-weight: 700;
   border-radius: 30px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+nav button:active {
+  transform: scale(0.97);
+}
+
+.nav-btn-primary {
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-nav > button > svg {
-  fill: #ffffff;
+.nav-btn-primary:hover {
+  background: #222222;
 }
 
-nav > button:hover {
-  background: #222;
-}
-
-nav > button:disabled {
-  background: #666;
+.nav-btn-primary:disabled {
+  background: #666666;
   cursor: not-allowed;
 }
 
-/* ========================================================
-   نافذة التوقيع بالكامل (#sigModal)
-   ======================================================== */
+.nav-btn-secondary {
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #000000;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn-secondary:hover {
+  background: #e9ecef;
+}
+
 dialog#sigModal {
   position: fixed;
   inset: 0;
@@ -477,13 +493,14 @@ dialog#sigModal > footer {
   border-top: 2px solid #000000;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 dialog#sigModal > footer > button {
-  padding: 8px 18px;
+  padding: 8px 14px;
   font-family: inherit;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   border-radius: 4px;
   cursor: pointer;
@@ -491,88 +508,160 @@ dialog#sigModal > footer > button {
   background: #ffffff;
 }
 
-dialog#sigModal > footer > button:last-of-type {
+dialog#sigModal > footer > button#sigAccept {
   background: #000000;
   color: #ffffff;
 }
 
-/* ========================================================
-   نافذة تسجيل الدخول (#loginModal)
-   ======================================================== */
-dialog#loginModal {
+dialog#sigModal > footer > button#sigUndo {
+  background: #f8f9fa;
+}
+
+dialog#loginModal,
+dialog#nameModal {
   border: none;
   border-radius: 8px;
   padding: 0;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   margin: auto;
   z-index: 99999;
   background: #ffffff;
 }
 
-dialog#loginModal::backdrop {
+dialog#loginModal::backdrop,
+dialog#nameModal::backdrop {
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
 }
 
-dialog#loginModal .login-header {
+.login-header,
+.modal-header {
   background: #000000;
   color: #ffffff;
   padding: 16px;
   text-align: center;
 }
 
-dialog#loginModal .login-header h3 {
+.login-header h3,
+.modal-header h3 {
   font-size: 1.15rem;
   color: #ffffff;
   margin-bottom: 4px;
 }
 
-dialog#loginModal .login-header p {
+.login-header p,
+.modal-header p {
   font-size: 0.8rem;
   color: #cccccc;
 }
 
-dialog#loginModal .login-body {
+.login-body,
+.modal-body {
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-dialog#loginModal .field {
+.field {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-dialog#loginModal .field label {
+.field label {
   font-size: 0.85rem;
   font-weight: 700;
 }
 
-dialog#loginModal .field input {
+.field input {
   padding: 8px 10px;
   font-size: 0.95rem;
   border: 1px solid #777;
   border-radius: 4px;
   outline: none;
+  font-family: inherit;
+}
+
+dialog#loginModal .field input {
   direction: ltr;
   text-align: left;
 }
 
-dialog#loginModal .field input:focus {
+.input-suffix {
+  display: flex;
+  align-items: center;
+  border: 1px solid #777;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.input-suffix input {
+  flex: 1;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 8px 10px;
+  direction: rtl;
+  text-align: right;
+}
+
+.input-suffix span {
+  padding: 8px 12px;
+  background: #e9ecef;
+  color: #495057;
+  font-weight: 700;
+  font-size: 0.9rem;
+  direction: ltr;
+  border-left: 1px solid #ccc;
+  user-select: none;
+}
+
+.input-suffix:focus-within {
   border-color: #000;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-dialog#loginModal .error-msg {
+.field input:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.error-msg {
   color: #d32f2f;
   font-size: 0.82rem;
   font-weight: 700;
   text-align: center;
   display: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.modal-actions button {
+  padding: 9px 18px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1.5px solid #000000;
+}
+
+.modal-actions button[type="button"] {
+  background: #ffffff;
+  color: #000000;
+}
+
+.modal-actions button[type="submit"] {
+  background: #000000;
+  color: #ffffff;
 }
 
 dialog#loginModal button[type="submit"] {
@@ -587,7 +676,8 @@ dialog#loginModal button[type="submit"] {
   font-family: inherit;
 }
 
-dialog#loginModal button[type="submit"]:hover {
+dialog#loginModal button[type="submit"]:hover,
+.modal-actions button[type="submit"]:hover {
   background: #222;
 }
 
@@ -607,5 +697,14 @@ dialog#loginModal button[type="submit"]:hover {
 
   main:not([data-pdf]) form > section {
     grid-template-columns: 1fr;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav button {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }
