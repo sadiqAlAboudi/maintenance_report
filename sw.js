@@ -1,4 +1,4 @@
-const CACHE_NAME = 'maintenance-report-v10';
+const CACHE_NAME = 'maintenance-report-v11';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

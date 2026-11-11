@@ -120,6 +120,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const f5 = document.getElementById('f5');
   const f6 = document.getElementById('f6');
   const f8 = document.getElementById('f8');
+  const f6Picker = document.getElementById('f6_picker');
+  const f8Picker = document.getElementById('f8_picker');
+
+  const toYYYYMMDD = (iso) => (iso ? iso.replace(/-/g, '/') : '');
+  const toISO = (slash) => (slash ? slash.trim().replace(/[\/\.]/g, '-') : '');
+
+  const bindDatePicker = (textInput, pickerInput) => {
+    if (!textInput || !pickerInput) return;
+    const open = () => {
+      pickerInput.value = toISO(textInput.value);
+      if (typeof pickerInput.showPicker === 'function') {
+        pickerInput.showPicker();
+      } else {
+        pickerInput.focus();
+      }
+    };
+    textInput.addEventListener('click', open);
+    pickerInput.addEventListener('change', () => {
+      textInput.value = toYYYYMMDD(pickerInput.value);
+    });
+    textInput.addEventListener('change', () => {
+      pickerInput.value = toISO(textInput.value);
+    });
+  };
+
+  bindDatePicker(f6, f6Picker);
+  bindDatePicker(f8, f8Picker);
 
   loginModal.addEventListener('cancel', e => e.preventDefault());
   window.addEventListener('keydown', e => {
@@ -163,9 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const setTodayDates = () => {
-    const today = new Date().toISOString().split('T')[0];
-    if (f6 && !f6.value) f6.value = today;
-    if (f8 && !f8.value) f8.value = today;
+    const todayIso = new Date().toISOString().split('T')[0];
+    const todayDisplay = toYYYYMMDD(todayIso);
+    if (f6) { f6.value = todayDisplay; if (f6Picker) f6Picker.value = todayIso; }
+    if (f8) { f8.value = todayDisplay; if (f8Picker) f8Picker.value = todayIso; }
   };
   setTodayDates();
 
@@ -191,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', async () => {
       const ok = await showModalAlert('هل ترغب بتفريغ حقول الاستمارة لبدء تقرير جديد؟', 'تأكيد التفريغ', true);
       if (!ok) return;
-      document.querySelectorAll('#report input:not(#f5):not([type="date"]), #report textarea').forEach(el => el.value = '');
+      document.querySelectorAll('#report input:not(#f5):not(.date-native), #report textarea').forEach(el => el.value = '');
       document.querySelectorAll('#report canvas').forEach(c => {
         c.getContext('2d').clearRect(0, 0, c.width, c.height);
       });
@@ -360,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const cleanDept = f1.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\s+/g, '_');
-    const dateVal = (f6 && f6.value) || new Date().toISOString().split('T')[0];
+    const dateVal = ((f6 && f6.value) || new Date().toISOString().split('T')[0]).replace(/[\/\.]/g, '_');
     pdfFilenameInput.value = `تقرير_صيانة_${cleanDept}_${dateVal}`;
     nameModal.showModal();
     pdfFilenameInput.select();

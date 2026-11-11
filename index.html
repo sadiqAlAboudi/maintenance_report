@@ -130,7 +130,10 @@
 
             <div>
               <label for="f6">التاريخ:</label>
-              <input type="date" id="f6">
+              <div class="date-field">
+                <input type="text" id="f6" class="date-input" placeholder="YYYY/MM/DD" pattern="\d{4}/\d{2}/\d{2}" dir="ltr" spellcheck="false" autocomplete="off">
+                <input type="date" id="f6_picker" class="date-native" tabindex="-1" aria-hidden="true">
+              </div>
             </div>
 
             <figure>
@@ -153,7 +156,10 @@
 
             <div>
               <label for="f8">التاريخ:</label>
-              <input type="date" id="f8">
+              <div class="date-field">
+                <input type="text" id="f8" class="date-input" placeholder="YYYY/MM/DD" pattern="\d{4}/\d{2}/\d{2}" dir="ltr" spellcheck="false" autocomplete="off">
+                <input type="date" id="f8_picker" class="date-native" tabindex="-1" aria-hidden="true">
+              </div>
             </div>
 
             <figure>
