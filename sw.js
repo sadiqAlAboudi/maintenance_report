@@ -1,4 +1,4 @@
-const CACHE_NAME = 'maintenance-report-v11';
+const CACHE_NAME = 'maintenance-report-v12';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,8 +6,11 @@ const ASSETS_TO_CACHE = [
   './images/uni_logo.png',
   './images/uni_logo.svg',
   './IBM-Plex-Sans-Arabic.woff2',
-  './js/app.js',
-  './css/style.css'
+  './css/flatpickr.min.css',
+  './css/style.css',
+  './js/flatpickr.min.js',
+  './js/flatpickr.ar.js',
+  './js/app.js'
 ];
 
 self.addEventListener('install', e => {
