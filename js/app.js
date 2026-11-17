@@ -121,15 +121,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const f6 = document.getElementById('f6');
   const f8 = document.getElementById('f8');
 
-  const fpConfig = {
-    locale: (window.flatpickr && flatpickr.l10ns && flatpickr.l10ns.ar) ? flatpickr.l10ns.ar : 'ar',
-    dateFormat: 'Y/m/d',
-    defaultDate: 'today',
-    disableMobile: true,
+  const getTodayISO = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  const fp6 = f6 && window.flatpickr ? flatpickr(f6, fpConfig) : null;
-  const fp8 = f8 && window.flatpickr ? flatpickr(f8, fpConfig) : null;
+  const updateDatePrintDisplay = () => {
+    const f6Print = document.getElementById('f6_print');
+    const f8Print = document.getElementById('f8_print');
+    if (f6Print && f6) {
+      f6Print.textContent = f6.value ? f6.value.replace(/-/g, '/') : '';
+    }
+    if (f8Print && f8) {
+      f8Print.textContent = f8.value ? f8.value.replace(/-/g, '/') : '';
+    }
+  };
+
+  const resetDates = () => {
+    const today = getTodayISO();
+    if (f6) f6.value = today;
+    if (f8) f8.value = today;
+    updateDatePrintDisplay();
+  };
+
+  resetDates();
+
+  [f6, f8].forEach(input => {
+    if (!input) return;
+    input.addEventListener('input', updateDatePrintDisplay);
+    input.addEventListener('change', updateDatePrintDisplay);
+    input.addEventListener('click', () => {
+      try {
+        if (typeof input.showPicker === 'function') {
+          input.showPicker();
+        }
+      } catch (_) {}
+    });
+  });
+
+  window.addEventListener('beforeprint', updateDatePrintDisplay);
 
   loginModal.addEventListener('cancel', e => e.preventDefault());
   window.addEventListener('keydown', e => {
@@ -171,12 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
       loginError.style.display = 'block';
     }
   });
-
-  const resetDates = () => {
-    const today = new Date();
-    if (fp6) fp6.setDate(today);
-    if (fp8) fp8.setDate(today);
-  };
 
   const savedTechName = localStorage.getItem('qu_tech_name');
   if (savedTechName && f5) {
@@ -369,7 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const cleanDept = f1.value.trim().replace(/[\/\\?%*:|"<>]/g, '-').replace(/\s+/g, '_');
-    const dateVal = ((f6 && f6.value) || new Date().toISOString().split('T')[0]).replace(/[\/\.]/g, '_');
+    const rawDate = (f6 && f6.value) || getTodayISO();
+    const dateVal = rawDate.replace(/[\/\.\-]/g, '_');
     pdfFilenameInput.value = `تقرير_صيانة_${cleanDept}_${dateVal}`;
     nameModal.showModal();
     pdfFilenameInput.select();

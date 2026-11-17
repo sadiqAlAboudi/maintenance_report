@@ -1,15 +1,13 @@
-const CACHE_NAME = 'maintenance-report-v12';
+const CACHE_NAME = 'maintenance-report-v14';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './images/favicon.ico',
   './images/uni_logo.png',
   './images/uni_logo.svg',
   './IBM-Plex-Sans-Arabic.woff2',
-  './css/flatpickr.min.css',
   './css/style.css',
-  './js/flatpickr.min.js',
-  './js/flatpickr.ar.js',
   './js/app.js'
 ];
 

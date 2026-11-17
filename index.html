@@ -3,14 +3,13 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>م / تقرير صيانة | جامعة القادسية</title>
   <meta name="description" content="استمارة إلكترونية رسمية لتوثيق أعمال صيانة الحاسبات والشبكات في جامعة القادسية مع ميزة التوقيع الحي على الشاشة وتصدير التقرير مباشرة بصيغة PDF." />
   <link rel="canonical" href="https://tools.qu.edu.iq/mr" />
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="preload" href="./IBM-Plex-Sans-Arabic.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="css/flatpickr.min.css" />
   <link rel="stylesheet" href="css/style.css" />
 
   <link rel="icon" href="images/favicon.ico" sizes="any" />
@@ -26,7 +25,7 @@
       <h3>تسجيل دخول فني الصيانة</h3>
       <p>شعبة صيانة الحاسبات والشبكات - جامعة القادسية</p>
     </div>
-    <form class="login-body" id="loginForm" onsubmit="return false;">
+    <form class="login-body" id="loginForm">
       <div class="field">
         <label for="u_name">اسم المستخدم:</label>
         <input type="text" id="u_name" required autocomplete="username" placeholder="Technician ID" />
@@ -45,7 +44,7 @@
       <h3>تسمية ملف التقرير</h3>
       <p>حدد اسم ملف PDF قبل المتابعة للتصدير</p>
     </div>
-    <form class="modal-body" id="nameForm" onsubmit="return false;">
+    <form class="modal-body" id="nameForm">
       <div class="field">
         <label for="pdf_filename">اسم الملف:</label>
         <div class="input-suffix">
@@ -131,7 +130,8 @@
 
             <div>
               <label for="f6">التاريخ:</label>
-              <input type="text" id="f6" class="date-input" placeholder="YYYY/MM/DD" dir="ltr" readonly>
+              <input type="date" id="f6" class="date-input">
+              <span class="date-print-val" id="f6_print" aria-hidden="true"></span>
             </div>
 
             <figure>
@@ -154,7 +154,8 @@
 
             <div>
               <label for="f8">التاريخ:</label>
-              <input type="text" id="f8" class="date-input" placeholder="YYYY/MM/DD" dir="ltr" readonly>
+              <input type="date" id="f8" class="date-input">
+              <span class="date-print-val" id="f8_print" aria-hidden="true"></span>
             </div>
 
             <figure>
@@ -208,8 +209,6 @@
     </footer>
   </dialog>
 
-  <script src="js/flatpickr.min.js"></script>
-  <script src="js/flatpickr.ar.js"></script>
   <script src="js/app.js"></script>
 </body>
 
