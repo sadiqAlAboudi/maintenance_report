@@ -1,0 +1,44 @@
+# =====================================================
+# Apache / cPanel Security Configuration
+# =====================================================
+
+# 1. Disable directory browsing
+Options -Indexes
+
+# 2. Set default index page
+DirectoryIndex index.php
+
+# 3. Restrict HTTP request methods to GET, POST, and HEAD only
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)$
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# 4. Deny direct HTTP access to configuration, storage, logs, and metadata files
+<FilesMatch "^(config\.php|\.storage|\.env|\.git|composer\.lock|.*\.log|.*\.json|.*\.bak|.*\.swp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 5. HTTP Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+</IfModule>
+
+# 6. Character encoding and MIME types
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+    AddType font/woff2 .woff2
+    AddType image/svg+xml .svg
+    AddType application/manifest+json .json
+</IfModule>

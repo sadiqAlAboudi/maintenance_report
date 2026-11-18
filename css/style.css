@@ -271,7 +271,8 @@ nav {
   flex-wrap: wrap;
 }
 
-nav button {
+nav button,
+nav a {
   font-family: inherit;
   font-weight: 700;
   border-radius: 30px;
@@ -279,10 +280,12 @@ nav button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  text-decoration: none;
   transition: transform 0.1s ease, background 0.2s ease;
 }
 
-nav button:active {
+nav button:active,
+nav a:active {
   transform: scale(0.97);
 }
 

@@ -1,3 +1,12 @@
+<?php
+/**
+ * Maintenance Report Application
+ * University of Al-Qadisiyah - Computer and Network Maintenance Division
+ */
+
+require_once __DIR__ . '/config.php';
+require_auth();
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -6,7 +15,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>م / تقرير صيانة | جامعة القادسية</title>
   <meta name="description" content="استمارة إلكترونية رسمية لتوثيق أعمال صيانة الحاسبات والشبكات في جامعة القادسية مع ميزة التوقيع الحي على الشاشة وتصدير التقرير مباشرة بصيغة PDF." />
-  <link rel="canonical" href="https://tools.qu.edu.iq/mr" />
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="preload" href="./IBM-Plex-Sans-Arabic.woff2" as="font" type="font/woff2" crossorigin />
@@ -18,26 +26,7 @@
   <meta name="theme-color" content="#000000" />
 </head>
 
-<body class="locked">
-
-  <dialog id="loginModal">
-    <div class="login-header">
-      <h3>تسجيل دخول فني الصيانة</h3>
-      <p>شعبة صيانة الحاسبات والشبكات - جامعة القادسية</p>
-    </div>
-    <form class="login-body" id="loginForm">
-      <div class="field">
-        <label for="u_name">اسم المستخدم:</label>
-        <input type="text" id="u_name" required autocomplete="username" placeholder="Technician ID" />
-      </div>
-      <div class="field">
-        <label for="u_pass">كلمة المرور:</label>
-        <input type="password" id="u_pass" required autocomplete="current-password" placeholder="••••••••" />
-      </div>
-      <div class="error-msg" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-      <button type="submit" id="submitLogin">دخول للنظام</button>
-    </form>
-  </dialog>
+<body>
 
   <dialog id="nameModal">
     <div class="modal-header">
@@ -185,12 +174,12 @@
       </svg>
       تصدير وتحميل PDF
     </button>
-    <button type="button" id="logoutBtn" class="nav-btn-secondary" title="قفل وتسجيل الخروج">
+    <a href="logout.php" id="logoutBtn" class="nav-btn-secondary" title="قفل وتسجيل الخروج" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
       </svg>
-      قفل
-    </button>
+      خروج
+    </a>
   </nav>
 
   <dialog id="sigModal">
